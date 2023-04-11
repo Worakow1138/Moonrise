@@ -40,7 +40,7 @@ class BaseTest:
                 test_case(self)
             except Exception as err:
                 print("Error: ", err)
-                self.browser.save_screenshot(test_case.__name__ + ".png")
+                self.moon_driver.save_screenshot(test_case.__name__ + ".png")
             finally:
                 self.test_teardown()
         suite_name = test_case.__qualname__.split(".")[0]

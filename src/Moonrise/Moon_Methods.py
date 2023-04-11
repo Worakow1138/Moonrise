@@ -2,7 +2,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-from Utility_Webdriver_Setup import UtilityWebdriverSetup as UWS
 from selenium.webdriver.support.ui import Select
 
 class MoonMethods:
@@ -49,7 +48,7 @@ class MoonMethods:
             True: EC.visibility_of_all_elements_located
         }
 
-        wait = WebDriverWait(UWS.browser, time_to_wait)
+        wait = WebDriverWait(self.moon_driver, time_to_wait)
         if type(locator) is WebElement:
             return locator
         if locator.startswith("/"):
