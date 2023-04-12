@@ -3,34 +3,43 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
+from selenium.common.exceptions import TimeoutException
 
 class MoonMethods:
-    """This class mostly houses calls to SeleniumLibrary Keywords that also behave in a "Smart" fashion, meaning these Keywords will:
-       1. Confirm that the element is visible before attempting to interact with the element
-       2. Confirm that any "loading elements" have ceased to be visible before attempting to search for the given elements
-       3. Fail the Keyword if any of the above actions are not correctly performed within a time limit given at call of the Keyword
-       4. Be accessible from a Python file as well as in Robot Framework
+    """Common-use methods when locating and interacting with web elements
     """
     
-    # Default time to wait for a desired condition in the Smart Keywords
+    # Default time to wait for elements to become visible.
+    # Can be changed in a Moonrise Test Suite by setting Moonrise.default_timeout = (new timeout)
     default_timeout = 60
 
     def get_web_element(self, locator, timeout=None, get_multiples = False):
-        """Performs a SeleniumLibrary ``robot_keyword`` while ensuring that the element represented by ``locator`` is first visible within 
-        the time limit in seconds, given by ``timeout``.
+        """Locate a web element or elements via a given ``locator``.
+           Throws a TimeoutException if the element(s) cannot be found within ``timeout`` or default_timeout
 
-        ``args`` represents any information necessary to the SeleniumLibrary keyword, e.g. Input Text requires an element locator and args="Text to Enter"
+           Can perform a search in 3 main ways:
+           - XPATH default: using the prefix '//' will automatically use XPATH to perform the search
+           - CSS default: simply inputting an element locator will try to locate the element via CSS selector
+           - By methods: specifying the lookup type will use the desired lookup method if it is available. Available methods include:
+             - name:some_name
+             - id:some_id
+             - link:link_text
+             - partial link text:partial_link_text
+             - class:class_of_element
+             - tag:element_tag
+             - css:css_selector
 
-        Waiting for the element to become visible is not performed if the keyword is defined as one of the ``wait_until`` SeleniumLibrary keywords
+           Arguments:
+           - ``locator``: The method by which to locate a web element.
+           - ``timeout``: How long to search for the element before throwing a TimeoutException.
+           - ``get_multiples``: If get_web_element should return a list of elements that match the given locator. False by default.
         """
 
-        # Timeout for element to be found may come from the timeout given to this method, the smart_timeout set when instantiating the RobotOil class,
-        # or the default_timeout.
+        # Timeout for element to be found may come from the timeout given to this method or the default_timeout.
         if timeout:
             time_to_wait = timeout
         else:
             time_to_wait = self.default_timeout
-        time_to_wait = int(time_to_wait)
 
         location_methods = {
             "name": By.NAME,
@@ -49,44 +58,25 @@ class MoonMethods:
         }
 
         wait = WebDriverWait(self.moon_driver, time_to_wait)
-        if type(locator) is WebElement:
-            return locator
-        if locator.startswith("/"):
-            return wait.until(multi_element_return.get(get_multiples)((By.XPATH, locator)))
-        elif locator.split(":")[0] in location_methods:
-            return wait.until(multi_element_return.get(get_multiples)((location_methods[locator.split(":")[0]], locator.split(":")[1])))
-        else:
-            return wait.until(multi_element_return.get(get_multiples)((By.CSS_SELECTOR, locator)))
+
+        try:
+            if type(locator) is WebElement:
+                return locator
+            if locator.startswith("/"):
+                return wait.until(multi_element_return.get(get_multiples)((By.XPATH, locator)))
+            elif locator.split(":")[0] in location_methods:
+                return wait.until(multi_element_return.get(get_multiples)((location_methods[locator.split(":")[0]], locator.split(":")[1])))
+            else:
+                return wait.until(multi_element_return.get(get_multiples)((By.CSS_SELECTOR, locator)))
+        except TimeoutException:
+            raise TimeoutException(f"Could not find '{locator}' after {time_to_wait} seconds.")
 
     def click_element(self, locator, timeout=None):
         """Click the element identified by ``locator``.
 
-        See the `Locating elements` section for details about the locator
-        syntax.
-
-        The ``modifier`` argument can be used to pass
-        [https://seleniumhq.github.io/selenium/docs/api/py/webdriver/selenium.webdriver.common.keys.html#selenium.webdriver.common.keys.Keys|Selenium Keys]
-        when clicking the element. The `+` can be used as a separator
-        for different Selenium Keys. The `CTRL` is internally translated to
-        the `CONTROL` key. The ``modifier`` is space and case insensitive, example
-        "alt" and " aLt " are supported formats to
-        [https://seleniumhq.github.io/selenium/docs/api/py/webdriver/selenium.webdriver.common.keys.html#selenium.webdriver.common.keys.Keys.ALT|ALT key]
-        . If ``modifier`` does not match to Selenium Keys, keyword fails.
-
-        If ``action_chain`` argument is true, see `Boolean arguments` for more
-        details on how to set boolean argument, then keyword uses ActionChain
-        based click instead of the <web_element>.click() function. If both
-        ``action_chain`` and ``modifier`` are defined, the click will be
-        performed using ``modifier`` and ``action_chain`` will be ignored.
-
-        Example:
-        | Click Element | id:button |                   | # Would click element without any modifiers.               |
-        | Click Element | id:button | CTRL              | # Would click element with CTLR key pressed down.          |
-        | Click Element | id:button | CTRL+ALT          | # Would click element with CTLR and ALT keys pressed down. |
-        | Click Element | id:button | action_chain=True | # Clicks the button using an Selenium  ActionChains        |
-
-        The ``modifier`` argument is new in SeleniumLibrary 3.2
-        The ``action_chain`` argument is new in SeleniumLibrary 4.1
+           Arguments:
+           - ``locator``: The method by which to locate a web element.
+           - ``timeout``: How long to search for the element before throwing a TimeoutException.
         """
         self.get_web_element(locator=locator, timeout=timeout).click()
 
@@ -94,93 +84,56 @@ class MoonMethods:
     def input_text(self, locator, text, timeout=None):
         """Types the given ``text`` into the text field identified by ``locator``.
 
-        When ``clear`` is true, the input element is cleared before
-        the text is typed into the element. When false, the previous text
-        is not cleared from the element. Use `Input Password` if you
-        do not want the given ``text`` to be logged.
-
-        If [https://github.com/SeleniumHQ/selenium/wiki/Grid2|Selenium Grid]
-        is used and the ``text`` argument points to a file in the file system,
-        then this keyword prevents the Selenium to transfer the file to the
-        Selenium Grid hub. Instead, this keyword will send the ``text`` string
-        as is to the element. If a file should be transferred to the hub and
-        upload should be performed, please use `Choose File` keyword.
-
-        See the `Locating elements` section for details about the locator
-        syntax. See the `Boolean arguments` section how Boolean values are
-        handled.
-
-        Disabling the file upload the Selenium Grid node and the `clear`
-        argument are new in SeleniumLibrary 4.0
+           Arguments:
+           - ``locator``: The method by which to locate a web element.
+           - ``timeout``: How long to search for the element before throwing a TimeoutException.
         """
         self.get_web_element(locator=locator, timeout=timeout).send_keys(text)
-
-    # def get_web_element(self, locator, timeout=None):
-    #     """Returns the first WebElement matching the given ``locator``.
-
-    #     See the `Locating elements` section for details about the locator
-    #     syntax.
-    #     """
-    #     return self.get_web_element(locator=locator, timeout=timeout)
 
     def get_web_elements(self, locator, timeout=None):
         """Returns a list of WebElement objects matching the ``locator``.
 
-        See the `Locating elements` section for details about the locator
-        syntax.
-
-        Starting from SeleniumLibrary 3.0, the keyword returns an empty
-        list if there are no matching elements. In previous releases, the
-        keyword failed in this case.
+           Arguments:
+           - ``locator``: The method by which to locate a web element.
+           - ``timeout``: How long to search for the element before throwing a TimeoutException.
         """
         return self.get_web_element(locator=locator, timeout=timeout, get_multiples=True)
 
-    def select_from_list_by_value(self, locator, values, timeout=None):
-        """Selects options from selection list ``locator`` by ``values``.
+    def select_from_list_by_value(self, locator, value, timeout=None):
+        """Select option from selection list ``locator`` by ``value``.
 
-        If more than one option is given for a single-selection list,
-        the last value will be selected. With multi-selection lists all
-        specified options are selected, but possible old selections are
-        not cleared.
-
-        See the `Locating elements` section for details about the locator
-        syntax.
+           Arguments:
+           - ``locator``: The method by which to locate a web element.
+           - ``value``: The value to select from the list.
+           - ``timeout``: How long to search for the element before throwing a TimeoutException.
         """
-        Select(self.get_web_element(locator=locator, timeout=timeout)).select_by_value(values)
+        Select(self.get_web_element(locator=locator, timeout=timeout)).select_by_value(value)
         
-    def select_from_list_by_label(self, locator, labels, timeout=None):
-        """Selects options from selection list ``locator`` by ``labels``.
+    def select_from_list_by_label(self, locator, label, timeout=None):
+        """Select option from selection list ``locator`` by ``label``.
 
-        If more than one option is given for a single-selection list,
-        the last value will be selected. With multi-selection lists all
-        specified options are selected, but possible old selections are
-        not cleared.
-
-        See the `Locating elements` section for details about the locator
-        syntax.
+           Arguments:
+           - ``locator``: The method by which to locate a web element.
+           - ``label``: The label to select from the list.
+           - ``timeout``: How long to search for the element before throwing a TimeoutException.
         """
-        Select(self.get_web_element(locator=locator, timeout=timeout)).select_by_visible_text(labels)
+        Select(self.get_web_element(locator=locator, timeout=timeout)).select_by_visible_text(label)
 
-    def select_from_list_by_index(self, locator, indexes, timeout=None):
-        """Selects options from selection list ``locator`` by ``indexes``.
+    def select_from_list_by_index(self, locator, index, timeout=None):
+        """Select option from selection list ``locator`` by ``index``.
 
-        Indexes of list options start from 0.
-
-        If more than one option is given for a single-selection list,
-        the last value will be selected. With multi-selection lists all
-        specified options are selected, but possible old selections are
-        not cleared.
-
-        See the `Locating elements` section for details about the locator
-        syntax.
+           Arguments:
+           - ``locator``: The method by which to locate a web element.
+           - ``index``: The index to select from the list.
+           - ``timeout``: How long to search for the element before throwing a TimeoutException.
         """
-        dd = self.get_web_element(locator=locator, timeout=timeout)
-        Select(dd).select_by_index(indexes) 
+        Select(self.get_web_element(locator=locator, timeout=timeout)).select_by_index(index) 
 
     def get_text(self, locator, timeout=None):
         """Returns the text value of the element identified by ``locator``.
 
-        See the `Locating elements` section for details about the locator
-        syntax.
+           Arguments:
+           - ``locator``: The method by which to locate a web element.
+           - ``timeout``: How long to search for the element before throwing a TimeoutException.
         """
         return self.get_web_element(locator=locator, timeout=timeout).text

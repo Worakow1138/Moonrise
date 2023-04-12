@@ -1,4 +1,4 @@
-
+import traceback
 
 class BaseTest:
     def __init__(self, *test_cases):
@@ -39,7 +39,7 @@ class BaseTest:
             try:
                 test_case(self)
             except Exception as err:
-                print("Error: ", err)
+                traceback.print_exception(err)
                 self.moon_driver.save_screenshot(test_case.__name__ + ".png")
             finally:
                 self.test_teardown()
