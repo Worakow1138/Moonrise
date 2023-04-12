@@ -12,13 +12,14 @@ except ImportError:
 
 class MoonBrowser:
 
-    def open_browser(self, browser_type, *browser_args):
-        """Creates a Smart Browser, a selenium-generated browser session that can be interacted with via Robot Keywords and Python methods, interchangeably. 
-           Smart Browsers and the accompanying webdriver exe file (chromedriver.exe, geckodriver.exe, etc.) do not automatically close after a test execution.
+    def open_browser(self, browser_type, *browser_args, persist=False):
+        """Opens a selenium browser of a specified browser type
            Arguments:
-           - url: The starting url for the Smart Browser to navigate to
-           - browser: The desired browser to open (currently supports Chrome, Firefox, Edge, and IE)
-           - browser_options: Additional arguments for the browser session, e.g. --headless to launch in headless modes
+           - browser_type: The desired browser (Chrome, Firefox, Edge, or IE).
+           - browser_args: Selenium browser arguments, e.g. --headless.
+           - persist: If set to True, will keep the browser open for later use.
+
+           Creates class variable moon_driver for access to selenium webdriver methods.
         """ 
 
         browser_options = {
@@ -48,18 +49,24 @@ class MoonBrowser:
         for arg in browser_args:
             options.add_argument(arg)
 
-        if "persist" in browser_args:
+        # Prevent the default browser cleanup 
+        if persist == True:
             Service.__del__ = lambda new_del: None
 
+        # moon_driver not only creates a browser session, but also can be used in higher-order methods to access selenium methods, e.g. refresh(), maximize_window(), etc.
         self.moon_driver = browser_options[browser_type]['webdriver_create'](options=options)
 
+        # write executor_url and session_id to a file named session_info.py for future use
         session_info_file = open(os.path.dirname(os.path.realpath(__file__))+'\\session_info.py', 'w')
         session_info_file.write(f'executor_url="{self.moon_driver.command_executor._url}"\nsession_id="{self.moon_driver.session_id}"')
+        session_info_file.close()
 
     def use_current_browser(self):
-        """Allows for test executions to begin on the last opened Smart Browser
+        """Allows for test executions to begin on the last opened browser
+           Also creates the moon_driver variable for access to selenium webdriver methods
         """
 
+        # To prevent a new browser session from being created, we need to temporarily overwrite the RemoteWebDriver.execute method
         # Save the original function, so we can revert our patch
         org_command_execute = RemoteWebDriver.execute
 
@@ -74,14 +81,13 @@ class MoonBrowser:
         RemoteWebDriver.execute = new_command_execute
 
         self.moon_driver = webdriver.Remote(command_executor=session_info.executor_url, desired_capabilities={})
-        self.moon_driver.session_id = session_info.session_id
 
         # Replace the patched function with original function
         RemoteWebDriver.execute = org_command_execute
 
 
     def cleanup_browser(self):
-        """Attempts to tear down most recent Smart Browser.
+        """Attempts to tear down most recent browser.
            Kills all geckodriver.exe, chromedriver.exe, and msedgedriver.exe processes.
         """
         try:
@@ -93,7 +99,9 @@ class MoonBrowser:
         subprocess.call('taskkill /f /im msedgedriver.exe', stdout=open(os.devnull, "wb"), stderr=open(os.devnull, "wb"))
 
     def navigate_to_page(self, url):
-        """
+        """Attempts to navigate to a web page without first needing https or http prefix
+           Arguments:
+           - url: The desired url
         """
         
         if not url.startswith("https") and not url.startswith("http"):
