@@ -92,6 +92,7 @@ class MoonBrowser:
         """
         try:
             self.moon_driver.quit()
+            self.moon_driver = None
         except:
             pass
         subprocess.call('taskkill /f /im geckodriver.exe', stdout=open(os.devnull, "wb"), stderr=open(os.devnull, "wb"))
