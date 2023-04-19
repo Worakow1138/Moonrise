@@ -4,13 +4,15 @@ from selenium import webdriver
 from selenium.webdriver.remote.webdriver import WebDriver as RemoteWebDriver
 from selenium.webdriver.common.service import Service
 try:
-    import session_info
+    from Moonrise import session_info
 except ImportError:
     pass
 
 
 
 class MoonBrowser:
+
+    moon_driver = None
 
     def open_browser(self, browser_type, *browser_args, persist=False):
         """Opens a selenium browser of a specified browser type
@@ -57,7 +59,7 @@ class MoonBrowser:
         self.moon_driver = browser_options[browser_type]['webdriver_create'](options=options)
 
         # write executor_url and session_id to a file named session_info.py for future use
-        session_info_file = open(os.path.dirname(os.path.realpath(__file__))+'\\session_info.py', 'w')
+        session_info_file = open(str(os.getcwd())+'\\session_info.py', 'w')
         session_info_file.write(f'executor_url="{self.moon_driver.command_executor._url}"\nsession_id="{self.moon_driver.session_id}"')
         session_info_file.close()
 
