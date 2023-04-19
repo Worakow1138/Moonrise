@@ -22,6 +22,18 @@ class BaseTest:
         self.failures = 0
         self.totals = 0
 
+        self.colors = {
+        "pass": Fore.LIGHTGREEN_EX,
+        "fail": Fore.LIGHTRED_EX,
+        "header": Fore.LIGHTCYAN_EX,
+        "info": ""
+    }
+
+        self.run_tests(test_cases)
+
+
+    def run_tests(self, test_cases):
+
         suite_tests = self.tests.get(f"{self.__module__}.{self.__class__.__name__}")
 
         if suite_tests is None or (test_cases != () and len(set(test_cases).intersection(suite_tests)) == 0):
@@ -48,29 +60,28 @@ class BaseTest:
 
         self.suite_teardown()
 
-    def log_to_report(self, message):
-        print(message)
-        # with self.report_file as of:
-            # of.write(message + '\n')
-        self.report_file.write(message + "\n")
-
+    def log_to_report(cls, message, log_type = "info"):
+        print(f"\n{cls.colors.get(log_type)}{message}{Style.RESET_ALL}")
+        for color in cls.colors.values():
+            message = message.replace(color, "")
+        cls.report_file.write("\n\n" + message)
 
     def suite_setup(self):
-        self.log_to_report(f"\n----------------- {Fore.LIGHTCYAN_EX}Beginning Suite: {self.__class__.__name__}{Style.RESET_ALL} -----------------")
+        self.log_to_report(f"----------------- Beginning Suite: {self.__class__.__name__} -----------------", log_type="header")
 
     def suite_teardown(self):
-        self.log_to_report(f"\n----------------- {Fore.LIGHTCYAN_EX}Ending Suite: {self.__class__.__name__}{Style.RESET_ALL} -----------------")
+        self.log_to_report(f"----------------- Ending Suite: {self.__class__.__name__} -----------------", log_type="header")
         if self.failures > 0:
-            end_string = f"{Fore.LIGHTGREEN_EX}{self.passes} tests passing, {Fore.LIGHTRED_EX}{self.failures} tests failing, {Style.RESET_ALL}{self.totals} tests total"
+            end_string = f"{self.colors.get('pass')}{self.passes} tests passing, {self.colors.get('fail')}{self.failures} tests failing, {self.colors.get('header')}{self.totals} tests total"
         else:
-            end_string = f"{Fore.LIGHTGREEN_EX}{self.passes} tests passing, {Style.RESET_ALL}{self.totals} tests total"
+            end_string = f"{self.colors.get('pass')}{self.passes} tests passing, {self.colors.get('info')}{self.totals} tests total"
         self.log_to_report(end_string)
 
     def test_teardown(self):
         pass
 
     def test_setup(self, tc_name):
-        self.log_to_report(f"\n--- {Fore.LIGHTCYAN_EX}Starting test: {tc_name}{Style.RESET_ALL} ---")
+        self.log_to_report(f"--- Starting test: {tc_name} ---", log_type="header")
         pass
 
     @classmethod
@@ -79,14 +90,13 @@ class BaseTest:
             self.test_setup(test_case.__name__)
             try:
                 test_case(self)
-                self.log_to_report(f"{Fore.LIGHTGREEN_EX}{test_case.__name__} PASS{Style.RESET_ALL}")
+                self.log_to_report(f"{test_case.__name__} PASS", log_type = "pass")
                 self.passes += 1
             except Exception as err:
-                self.log_to_report(str(err))
-                traceback.print_exception(err)
+                self.log_to_report(f"{traceback.format_exc()}")
                 if self.moon_driver:
                     self.moon_driver.save_screenshot(f"{self.reports_folder}\\{test_case.__name__}.png")
-                self.log_to_report(f"{Fore.LIGHTRED_EX}{test_case.__name__} FAIL{Style.RESET_ALL}")
+                self.log_to_report(f"{test_case.__name__} FAIL", log_type = "fail")
                 self.failures += 1
             finally:
                 self.test_teardown()
