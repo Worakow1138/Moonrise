@@ -51,14 +51,22 @@ class BaseTest:
         else:
             test_cases = suite_tests
         
+        self.log_to_report(f"----------------- Beginning Suite: {self.__class__.__name__} -----------------", log_type="header")
         self.suite_setup()
 
         self.totals += len(test_cases)
         
         for tc in test_cases:
+            self.log_to_report(f"--- Starting test: {tc} ---", log_type="header")
             suite_tests.get(tc)(self)
 
+        self.log_to_report(f"----------------- Ending Suite: {self.__class__.__name__} -----------------", log_type="header")
         self.suite_teardown()
+        if self.failures > 0:
+            end_string = f"{self.colors.get('pass')}{self.passes} tests passing, {self.colors.get('fail')}{self.failures} tests failing, {self.colors.get('header')}{self.totals} tests total"
+        else:
+            end_string = f"{self.colors.get('pass')}{self.passes} tests passing, {self.colors.get('header')}{self.totals} tests total"
+        self.log_to_report(end_string)
 
     def log_to_report(cls, message, log_type = "info"):
         print(f"\n{cls.colors.get(log_type)}{message}{Style.RESET_ALL}")
@@ -67,27 +75,21 @@ class BaseTest:
         cls.report_file.write("\n\n" + message)
 
     def suite_setup(self):
-        self.log_to_report(f"----------------- Beginning Suite: {self.__class__.__name__} -----------------", log_type="header")
+        pass
 
     def suite_teardown(self):
-        self.log_to_report(f"----------------- Ending Suite: {self.__class__.__name__} -----------------", log_type="header")
-        if self.failures > 0:
-            end_string = f"{self.colors.get('pass')}{self.passes} tests passing, {self.colors.get('fail')}{self.failures} tests failing, {self.colors.get('header')}{self.totals} tests total"
-        else:
-            end_string = f"{self.colors.get('pass')}{self.passes} tests passing, {self.colors.get('header')}{self.totals} tests total"
-        self.log_to_report(end_string)
+        pass
 
     def test_teardown(self):
         pass
 
-    def test_setup(self, tc_name):
-        self.log_to_report(f"--- Starting test: {tc_name} ---", log_type="header")
+    def test_setup(self):
         pass
 
     @classmethod
     def test(cls, test_case):
         def test_wrapper(self):
-            self.test_setup(test_case.__name__)
+            self.test_setup()
             try:
                 test_case(self)
                 self.log_to_report(f"{test_case.__name__} PASS", log_type = "pass")
