@@ -27,7 +27,7 @@ class BaseTest:
         "fail": Fore.LIGHTRED_EX,
         "header": Fore.LIGHTCYAN_EX,
         "info": ""
-    }
+        }
 
         self.run_tests(test_cases)
 
@@ -74,7 +74,7 @@ class BaseTest:
         if self.failures > 0:
             end_string = f"{self.colors.get('pass')}{self.passes} tests passing, {self.colors.get('fail')}{self.failures} tests failing, {self.colors.get('header')}{self.totals} tests total"
         else:
-            end_string = f"{self.colors.get('pass')}{self.passes} tests passing, {self.colors.get('info')}{self.totals} tests total"
+            end_string = f"{self.colors.get('pass')}{self.passes} tests passing, {self.colors.get('header')}{self.totals} tests total"
         self.log_to_report(end_string)
 
     def test_teardown(self):
@@ -92,7 +92,7 @@ class BaseTest:
                 test_case(self)
                 self.log_to_report(f"{test_case.__name__} PASS", log_type = "pass")
                 self.passes += 1
-            except Exception as err:
+            except Exception:
                 self.log_to_report(f"{traceback.format_exc()}")
                 if self.moon_driver:
                     self.moon_driver.save_screenshot(f"{self.reports_folder}\\{test_case.__name__}.png")
