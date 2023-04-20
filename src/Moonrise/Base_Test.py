@@ -1,6 +1,7 @@
 import os
 import traceback
 from colorama import Fore, Style, init
+import datetime
 init(convert=True)
 
 class BaseTest:
@@ -66,13 +67,14 @@ class BaseTest:
             end_string = f"{self.colors.get('pass')}{self.passes} tests passing, {self.colors.get('fail')}{self.failures} tests failing, {self.colors.get('header')}{self.totals} tests total"
         else:
             end_string = f"{self.colors.get('pass')}{self.passes} tests passing, {self.colors.get('header')}{self.totals} tests total"
-        self.log_to_report(end_string)
+        self.log_to_report(end_string, log_type="header")
 
     def log_to_report(cls, message, log_type = "info"):
-        print(f"\n{cls.colors.get(log_type)}{message}{Style.RESET_ALL}")
+        timestamp = datetime.datetime.now()
+        print(f"\n{cls.colors.get(log_type)}{timestamp} | {message}{Style.RESET_ALL}")
         for color in cls.colors.values():
             message = message.replace(color, "")
-        cls.report_file.write("\n\n" + message)
+        cls.report_file.write(f"\n\n{timestamp} | {message}")
 
     def suite_setup(self):
         pass
