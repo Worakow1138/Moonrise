@@ -34,5 +34,5 @@ setup(
     # package_data = {},
     packages     = find_packages('src'),
     install_requires = ["selenium", "colorama"],
-    entry_points = {'console_scripts': ['moonrise = Moonrise.__main__:run_cli']}
+    entry_points = {'console_scripts': ['moonrise = moonrise.__main__:run_cli']}
 )

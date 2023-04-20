@@ -1,8 +1,8 @@
 
 import os
 import sys
-from Moonrise.Base_Test import BaseTest
-from Moonrise import Moonrise
+from moonrise.Base_Test import BaseTest
+from moonrise import Moonrise
 
 def run_cli(args=None):
     if args is None:
