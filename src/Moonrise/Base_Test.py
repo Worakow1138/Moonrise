@@ -18,6 +18,18 @@ class BaseTest:
            - `test_cases`: Test Case names to be executed. If none specified, will execute all test cases under the given test suite.
         """
 
+        self.suite_tests = self.tests.get(f"{self.__module__}.{self.__class__.__name__}")
+
+        if self.suite_tests is None or (test_cases != () and len(set(test_cases).intersection(self.suite_tests)) == 0):
+            if test_cases and self.suite_tests:
+                print(f'Skipping test suite "{self.__class__.__name__}" because no tests matching {test_cases} were found.')
+            return
+        
+        if test_cases:
+            test_cases = set(test_cases).intersection(self.suite_tests)
+        else:
+            test_cases = self.suite_tests
+
         self.passes = 0
         self.failures = 0
         self.totals = 0
@@ -29,27 +41,15 @@ class BaseTest:
         "info": ""
         }
 
+        if not os.path.exists(str(f"{os.getcwd()}\\reports\\{self.__module__}\\{self.__class__.__name__}")):
+            os.makedirs(str(f"{os.getcwd()}\\reports\\{self.__module__}\\{self.__class__.__name__}"))
+        self.reports_folder = str(f"{os.getcwd()}\\reports\\{self.__module__}\\{self.__class__.__name__}")
+        self.report_file = open(f"{self.reports_folder}\\{self.__class__.__name__}.log", "w")
+
         self.run_tests(test_cases)
 
 
     def run_tests(self, test_cases):
-
-        suite_tests = self.tests.get(f"{self.__module__}.{self.__class__.__name__}")
-
-        if suite_tests is None or (test_cases != () and len(set(test_cases).intersection(suite_tests)) == 0):
-            if test_cases and suite_tests:
-                print(f'Skipping test suite "{self.__class__.__name__}" because no tests matching {test_cases} were found.')
-            return
-        
-        if not os.path.exists(str(os.getcwd() + "\\reports")):
-            os.makedirs(str(os.getcwd()) + "\\reports")
-        self.reports_folder = str(os.getcwd() + "\\reports")
-        self.report_file = open(f"{self.reports_folder}\\{self.__class__.__name__}.log", "w")
-        
-        if test_cases:
-            test_cases = set(test_cases).intersection(suite_tests)
-        else:
-            test_cases = suite_tests
         
         self.log_to_report(f"----------------- Beginning Suite: {self.__class__.__name__} -----------------", log_type="header")
         self.suite_setup()
@@ -58,7 +58,7 @@ class BaseTest:
         
         for tc in test_cases:
             self.log_to_report(f"--- Starting test: {tc} ---", log_type="header")
-            suite_tests.get(tc)(self)
+            self.suite_tests.get(tc)(self)
 
         self.log_to_report(f"----------------- Ending Suite: {self.__class__.__name__} -----------------", log_type="header")
         self.suite_teardown()
