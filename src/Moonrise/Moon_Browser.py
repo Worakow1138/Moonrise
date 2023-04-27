@@ -68,7 +68,7 @@ class MoonBrowser:
         """
 
         try:
-            from Moonrise import session_info
+            from moonrise import session_info
         except ImportError:
             raise ImportError("No open browser sessions.")
 
