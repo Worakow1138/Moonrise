@@ -10,7 +10,7 @@
   - [Why the Name "Moonrise"?](#why-the-name-moonrise)
 
 ## Introduction
-lorem ipsum
+Moonrise is a test suite creation toolset with additional quality of life upgrades for using the selenium test framework.
 
 ## Dependencies
 Moonrise only has two dependencies: [selenium](https://pypi.org/project/selenium/) and [colorama](https://pypi.org/project/colorama/). Both of these dependencies are automatically installed with moonrise.
