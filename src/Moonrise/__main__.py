@@ -2,6 +2,7 @@ import os
 import sys
 from moonrise.Base_Test import BaseTest
 from moonrise import Moonrise
+from colorama import Fore, Style
 
 def run_cli(args=None):
     if args is None:
@@ -41,7 +42,7 @@ def run_cli(args=None):
     tests = tuple(tests)
 
     if not modules:
-        print("moonrise Error: No valid file or directory given")
+        print(f"{Fore.LIGHTRED_EX}moonrise Error: No valid file or directory given{Style.RESET_ALL}")
         return
     
     tests_were_run = False
@@ -58,7 +59,7 @@ def run_cli(args=None):
                     clazz(tests)
 
     if not tests_were_run:
-        print("moonrise Error: No tests were run. Were the tests or suites labeled correctly?")
+        print(f"{Fore.LIGHTRED_EX}moonrise Error: No tests were run. Were the tests or suites labeled correctly?{Style.RESET_ALL}")
         return
 
 
