@@ -23,7 +23,7 @@ class BaseTest:
 
         if self.suite_tests is None or (test_cases != () and len(set(test_cases).intersection(self.suite_tests)) == 0):
             if test_cases and self.suite_tests:
-                print(f'Skipping test suite "{self.__class__.__name__}" because no tests matching {test_cases} were found.')
+                print(f'Skipping test suite "{self.__class__.__name__}" in module "{self.__module__}" because no tests matching {test_cases} were found.')
             return
         
         if test_cases:
