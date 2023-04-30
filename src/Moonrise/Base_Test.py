@@ -13,15 +13,18 @@ class BaseTest:
 
 
     def __init__(self, test_cases=()):
-        """Executes all test cases that either fall under the `tests` dictionary, or are specified by `test_cases`.
+        """Evaluates whether to run tests within the current test suite based on user input and creates report folder and file structures.
 
            Arguments:
-           - `test_cases`: Test Case names to be executed. If none specified, will execute all test cases under the given test suite.
+           - `test_cases`: Test Case names to be executed. If none specified, will execute all test cases under the current test suite.
         """
 
         self.suite_tests = self.tests.get(f"{self.__module__}.{self.__class__.__name__}")
 
+        # If the condition is present where there are no tests in a suite or the user-requested tests cases do not match the current suite,
+        # do not proceed.
         if self.suite_tests is None or (test_cases != () and len(set(test_cases).intersection(self.suite_tests)) == 0):
+            # Add an extra note if test cases were specified but do not exist in the current suite.
             if test_cases and self.suite_tests:
                 print(f'Skipping test suite "{self.__class__.__name__}" in module "{self.__module__}" because no tests matching {test_cases} were found.')
             return
@@ -51,8 +54,14 @@ class BaseTest:
 
 
     def run_tests(self, test_cases):
+        """Method to call the requested tests.
+
+           Arguments:
+           - `test_cases`: Test Case names to be executed.
+        """
         
         self.log_to_report(f"----------------- Beginning Suite: {self.__class__.__name__} -----------------", log_type="header")
+        # Perform suite setup actions before any tests are executed.
         self.suite_setup()
 
         self.totals += len(test_cases)
@@ -62,14 +71,23 @@ class BaseTest:
             self.suite_tests.get(tc)(self)
 
         self.log_to_report(f"----------------- Ending Suite: {self.__class__.__name__} -----------------", log_type="header")
+        # Perform suite teardown actions after all tests are executed.
         self.suite_teardown()
+
         if self.failures > 0:
             end_string = f"{self.colors.get('pass')}{self.passes} tests passing, {self.colors.get('fail')}{self.failures} tests failing, {self.colors.get('header')}{self.totals} tests total"
         else:
             end_string = f"{self.colors.get('pass')}{self.passes} tests passing, {self.colors.get('header')}{self.totals} tests total"
+
         self.log_to_report(end_string, log_type="header")
 
     def log_to_report(cls, message, log_type = "info"):
+        """Log information with a timestamp to the console and to the report file.
+
+           Arguments:
+           - message: The text to log.
+           - log_type: The color of the text as it wil appear in the conole. Consult the colors variable in this class for specifics.
+        """
         timestamp = datetime.datetime.now()
         print(f"\n{cls.colors.get(log_type)}{timestamp} | {message}{Style.RESET_ALL}")
         for color in cls.colors.values():
@@ -77,20 +95,38 @@ class BaseTest:
         cls.report_file.write(f"\n\n{timestamp} | {message}")
 
     def suite_setup(self):
+        """Default suite setup method to be called before any tests are executed.
+        """
         pass
 
     def suite_teardown(self):
+        """Default suite teardown method to be called after all tests are executed.
+        """
         pass
 
     def test_teardown(self):
+        """Default test teardown method to be called after every test is executed.
+        """
         pass
 
     def test_setup(self):
+        """Default test setup method to be called before every tests is executed.
+        """
         pass
 
     @classmethod
     def test(cls, test_case):
-        def test_wrapper(self):
+        """Decorator method to hang on every method that is to be classified as a test case.
+           Adds test case methods to the tests variable in this class. 
+           These tests will be referenced upon attempting to run their test suites.
+
+           Arguments:
+           - test_case: The name of the method to add as a test case.
+        """
+
+        def test_executor(self):
+            """Executes the current test case, performing test setup actions, handling failures, and finally calling test teardown actions.
+            """
             self.test_setup()
             try:
                 test_case(self)
@@ -104,7 +140,8 @@ class BaseTest:
                 self.failures += 1
             finally:
                 self.test_teardown()
+
         mod_and_suite = f"{test_case.__module__}.{test_case.__qualname__.split('.')[0]}"
         cls.tests.setdefault(mod_and_suite, {})
-        cls.tests[mod_and_suite][test_case.__name__] = test_wrapper
-        return test_wrapper
+        cls.tests[mod_and_suite][test_case.__name__] = test_executor
+        return test_executor
