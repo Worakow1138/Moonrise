@@ -10,7 +10,13 @@
   - [Why the Name "Moonrise"?](#why-the-name-moonrise)
 
 ## Introduction
-Moonrise is a test suite creation toolset with additional quality of life upgrades for using the selenium test framework.
+Moonrise is a test suite creation toolset with additional quality of life upgrades for using the [selenium](https://www.selenium.dev/) test framework.
+
+Notable features:
+- Test Suite and Test Case organization
+- Browser session generation with selenium
+- Web element lookup methods with built-in dynamic waits for elements to become available
+- Test report generation
 
 ## Dependencies
 Moonrise only has two dependencies: [selenium](https://pypi.org/project/selenium/) and [colorama](https://pypi.org/project/colorama/). Both of these dependencies are automatically installed with moonrise.
@@ -19,7 +25,15 @@ Moonrise only has two dependencies: [selenium](https://pypi.org/project/selenium
 Recommend using pypi to install moonrise, `pip install moonrise`. You may also retrieve the latest version from [github](https://github.com/Worakow1138/Moonrise).
 
 ## Usage
-lorem ipsum
+Moonrise is designed for ultimate ease of use while still giving access to the power of the selenium framework. By simply extending the Moonrise class, any Python class becomes a test suite, capable of executing automated test cases and generating test reports.
+
+    from moonrise import Moonrise
+
+    class ExampleSuite(Moonrise):
+        
+        @Moonrise.test
+        def example_test(self):
+            print("this is a test")
 
 ### CLI Commands
 lorem ipsum
