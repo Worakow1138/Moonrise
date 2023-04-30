@@ -41,7 +41,8 @@ def run_cli(args=None):
     tests = tuple(tests)
 
     if not modules:
-        return "moonrise Error: No valid file or directory given"
+        print("moonrise Error: No valid file or directory given")
+        return
     
     tests_were_run = False
 
@@ -57,7 +58,8 @@ def run_cli(args=None):
                     clazz(tests)
 
     if not tests_were_run:
-        return "moonrise Error: No tests were run. Were the tests or suites labeled correctly?"
+        print("moonrise Error: No tests were run. Were the tests or suites labeled correctly?")
+        return
 
 
 if __name__ == "__main__":
