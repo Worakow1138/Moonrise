@@ -13,10 +13,10 @@
 lorem ipsum
 
 ## Dependencies
-lorem ipsum
+Moonrise only has two dependencies: [selenium](https://pypi.org/project/selenium/) and [colorama](https://pypi.org/project/colorama/). Both of these dependencies are automatically installed with moonrise.
 
 ## Installation
-lorem ipsum
+Recommend using pypi to install moonrise, `pip install moonrise`. You may also retrieve the latest version from [github](https://github.com/Worakow1138/Moonrise).
 
 ## Usage
 lorem ipsum
