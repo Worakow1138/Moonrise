@@ -40,8 +40,10 @@ Below are two example test suites created to be used with Moonrise. Copy this ex
 
     from moonrise import Moonrise
 
+    ### Classes represent test suites ###
     class ExampleSuite(Moonrise):
 
+        ### Default methods for test and suite setup and teardown are provided ###
         def suite_setup(self):
             self.log_to_report("this is the beginning of the test suite.")
         
@@ -54,8 +56,10 @@ Below are two example test suites created to be used with Moonrise. Copy this ex
         def test_teardown(self):
             self.log_to_report("this is the end of the test case.")
         
+        ### Tag test cases with @Moonrise.test decorator ###
         @Moonrise.test
         def example_test(self):
+            ### Use log_to_report() for detailed reporting ###
             self.log_to_report("this is a test")
         
         @Moonrise.test
@@ -65,9 +69,11 @@ Below are two example test suites created to be used with Moonrise. Copy this ex
 
     class SeleniumExamples(Moonrise):
         
+        ### Set the default time to search for web elements ###
         Moonrise.default_timeout = 10
         
         def test_setup(self):
+            ### Settings the persist argument to True allows for persistent browser sessions that will remain open and available for reuse with the self.use_current_browser() method ###
             self.open_browser("chrome", persist=True)
             self.moon_driver.maximize_window()
         
@@ -84,6 +90,7 @@ Below are two example test suites created to be used with Moonrise. Copy this ex
         def fail_to_retrieve_hello_world_in_time(self):
             self.navigate_to_page("the-internet.herokuapp.com/dynamic_loading/2")
             self.click_element("#start button")
+            ### Waiting for elements to be present can be set on individual keywords ###
             self.log_to_report(self.get_text("#finish", timeout=2))
 
 ### CLI Commands
