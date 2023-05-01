@@ -104,7 +104,7 @@ The easiest way to use Moonrise is through the command line. The CLI offers a br
 - Use `moonrise (a folder containing python modules)` to execute all Moonrise tests and suites within that folder.
 - Use `moonrise (a python file)` to target a specific file that may contain Moonrise tests and suites.
 - Use `test:(test name)` to target specific tests. This keyword may be used more than once in a command and can apply to similarly named tests across multiple suites and python files.
-- Use `suite:(suite name)` to target specific test suites. This keyword may be used more than once in a command and can apploy to similarly named suites across mulitple python files.
+- Use `suite:(suite name)` to target specific test suites. This keyword may be used more than once in a command and can apply to similarly named suites across mulitple python files.
 
 With the [above example](#example-test-suites), run only the `ExampleSuite` by typing `moonrise (path to file or containing folder) suite:ExampleSuite`.
 

@@ -86,7 +86,7 @@ class BaseTest:
 
            Arguments:
            - message: The text to log.
-           - log_type: The color of the text as it wil appear in the conole. Consult the colors variable in this class for specifics.
+           - log_type: The color of the text as it will appear in the console. Consult the colors variable in this class for specifics.
         """
         timestamp = datetime.datetime.now()
         print(f"\n{cls.colors.get(log_type)}{timestamp} | {message}{Style.RESET_ALL}")
