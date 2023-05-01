@@ -80,6 +80,7 @@ Below are two example test suites created to be used with Moonrise. Copy this ex
         def test_setup(self):
             ### Settings the persist argument to True allows for persistent browser sessions that will remain open and available for reuse with the self.use_current_browser() method ###
             self.open_browser("chrome", persist=True)
+            ### moon_driver is the webdriver created with open_browser and can be directly controlled from the test case.
             self.moon_driver.maximize_window()
         
         def test_teardown(self):
