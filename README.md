@@ -5,8 +5,8 @@
   - [Dependencies](#dependencies)
   - [Installation](#installation)
   - [Usage](#usage)
-    - [CLI Commands](#cli-commands)
     - [Example Test Suite](#example-test-suite)
+    - [CLI Commands](#cli-commands)
   - [Why the Name "Moonrise"?](#why-the-name-moonrise)
 
 ## Introduction
@@ -33,13 +33,13 @@ Moonrise is designed for ultimate ease of use while still giving access to the p
         
         @Moonrise.test
         def example_test(self):
-            print("this is a test")
-
-### CLI Commands
-lorem ipsum
+            self.log_to_report("this is a test")
 
 ### Example Test Suite
 lorem ipsum
+
+### CLI Commands
+The easiest way to use Moonrise is through the command line.
 
 ## Why the Name "Moonrise"?
 Since [selenium](https://www.selenium.dev/) is named after the element [Selenium](https://en.wikipedia.org/wiki/Selenium), which is named after [Selene](https://en.wikipedia.org/wiki/Selene), the ancient Greek goddess of the Moon, it only seemed fitting to have a name that incorporated a lunar theme!
