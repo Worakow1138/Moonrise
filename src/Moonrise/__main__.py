@@ -5,10 +5,17 @@ from moonrise import Moonrise
 from colorama import Fore, Style
 
 def run_cli(args=None):
+    """Method for running command line interface
+
+       Arguments:
+       - args: arguments from the command line specifying the python module or folder, the tests to run, and/or the suites to run.
+    """
     if args is None:
         args = sys.argv[1:]
     
     def import_modules(filepath):
+        """Add relevant modules to path and to modules to examine for Moonrise tests and suites.
+        """
 
         if ":" in filepath:
             dir_name = filepath
@@ -23,8 +30,7 @@ def run_cli(args=None):
             sys.path.append(dir_name)
             for name in os.listdir(dir_name):
                 if name.endswith(".py"):
-                    module = name[:-3]
-    
+                    module = name[:-3]    
                     modules.append(__import__(module))
 
     modules = []
