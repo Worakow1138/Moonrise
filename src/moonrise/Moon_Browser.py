@@ -111,7 +111,7 @@ class MoonBrowser:
         try:
             for process in processes:
                 subprocess.call(f'taskkill /f /im {process}', stdout=open(os.devnull, "wb"), stderr=open(os.devnull, "wb"))
-        except FileExistsError:
+        except FileNotFoundError:
             pass
             
     def navigate_to_page(self, url):
