@@ -56,7 +56,7 @@ class MoonBrowser:
 
         # write executor_url and session_id to a file named session_info.py for future use
         try:
-            session_info_file = open(os.path.dirname(os.path.realpath(__file__))+'\\session_info.py', 'w')
+            session_info_file = open(os.path.dirname(os.path.realpath(__file__))+'/session_info.py', 'w')
             session_info_file.write(f'executor_url="{self.moon_driver.command_executor._url}"\nsession_id="{self.moon_driver.session_id}"')
             session_info_file.close()
         except FileNotFoundError:
@@ -99,13 +99,18 @@ class MoonBrowser:
         try:
             self.moon_driver.quit()
             self.moon_driver = None
-            os.remove(os.path.dirname(os.path.realpath(__file__))+'\\session_info.py')
-        except:
+        except AttributeError:
             pass
-        subprocess.call('taskkill /f /im geckodriver.exe', stdout=open(os.devnull, "wb"), stderr=open(os.devnull, "wb"))
-        subprocess.call('taskkill /f /im chromedriver.exe', stdout=open(os.devnull, "wb"), stderr=open(os.devnull, "wb"))
-        subprocess.call('taskkill /f /im msedgedriver.exe', stdout=open(os.devnull, "wb"), stderr=open(os.devnull, "wb"))
 
+        try:
+            os.remove(os.path.dirname(os.path.realpath(__file__))+'/session_info.py')
+        except FileNotFoundError:
+            pass
+        
+        processes = ["geckodriver.exe", "chromedriver.exe", "msedgedriver.exe"]
+        for process in processes:
+            subprocess.call(f'taskkill /f /im {process}', stdout=open(os.devnull, "wb"), stderr=open(os.devnull, "wb"))
+            
     def navigate_to_page(self, url):
         """Attempts to navigate to a web page without first needing https or http prefix
            Arguments:

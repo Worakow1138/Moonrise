@@ -45,10 +45,10 @@ class BaseTest:
         "info": ""
         }
 
-        if not os.path.exists(str(f"{os.getcwd()}\\reports\\{self.__module__}\\{self.__class__.__name__}")):
-            os.makedirs(str(f"{os.getcwd()}\\reports\\{self.__module__}\\{self.__class__.__name__}"))
-        self.reports_folder = str(f"{os.getcwd()}\\reports\\{self.__module__}\\{self.__class__.__name__}")
-        self.report_file = open(f"{self.reports_folder}\\{self.__class__.__name__}.log", "w")
+        if not os.path.exists(str(f"{os.getcwd()}/reports/{self.__module__}/{self.__class__.__name__}")):
+            os.makedirs(str(f"{os.getcwd()}/reports/{self.__module__}/{self.__class__.__name__}"))
+        self.reports_folder = str(f"{os.getcwd()}/reports/{self.__module__}/{self.__class__.__name__}")
+        self.report_file = open(f"{self.reports_folder}/{self.__class__.__name__}.log", "w")
 
         self.run_tests(test_cases)
 
@@ -135,7 +135,7 @@ class BaseTest:
             except Exception:
                 self.log_to_report(f"{traceback.format_exc()}")
                 if self.moon_driver:
-                    self.moon_driver.save_screenshot(f"{self.reports_folder}\\{test_case.__name__}.png")
+                    self.moon_driver.save_screenshot(f"{self.reports_folder}/{test_case.__name__}.png")
                 self.log_to_report(f"{test_case.__name__} FAIL", log_type = "fail")
                 self.failures += 1
             finally:

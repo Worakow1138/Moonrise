@@ -20,7 +20,7 @@ def run_cli(args=None):
         if ":" in filepath:
             dir_name = filepath
         else:
-            dir_name = os.getcwd() + "\\" + filepath
+            dir_name = os.getcwd() + "/" + filepath
 
         if os.path.isfile(dir_name):
             sys.path.append(os.path.abspath(os.path.join(dir_name, os.pardir)))
