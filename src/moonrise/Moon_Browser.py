@@ -108,8 +108,11 @@ class MoonBrowser:
             pass
         
         processes = ["geckodriver.exe", "chromedriver.exe", "msedgedriver.exe"]
-        for process in processes:
-            subprocess.call(f'taskkill /f /im {process}', stdout=open(os.devnull, "wb"), stderr=open(os.devnull, "wb"))
+        try:
+            for process in processes:
+                subprocess.call(f'taskkill /f /im {process}', stdout=open(os.devnull, "wb"), stderr=open(os.devnull, "wb"))
+        except FileExistsError:
+            pass
             
     def navigate_to_page(self, url):
         """Attempts to navigate to a web page without first needing https or http prefix
