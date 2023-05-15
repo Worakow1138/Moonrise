@@ -2,6 +2,7 @@ import os
 import traceback
 from colorama import Fore, Style, init
 import datetime
+from moonrise.screenshots import ScreenshotThread
 init(convert=True)
 
 class BaseTest:
@@ -47,7 +48,9 @@ class BaseTest:
 
         if not os.path.exists(str(f"{os.getcwd()}/reports/{self.__module__}/{self.__class__.__name__}")):
             os.makedirs(str(f"{os.getcwd()}/reports/{self.__module__}/{self.__class__.__name__}"))
+            os.makedirs(str(f"{os.getcwd()}/reports/{self.__module__}/{self.__class__.__name__}/video"))
         self.reports_folder = str(f"{os.getcwd()}/reports/{self.__module__}/{self.__class__.__name__}")
+        self.video_folder = self.reports_folder + "/video"
         self.report_file = open(f"{self.reports_folder}/{self.__class__.__name__}.log", "w")
 
         self.run_tests(test_cases)
@@ -64,6 +67,9 @@ class BaseTest:
         # Perform suite setup actions before any tests are executed.
         self.suite_setup()
 
+        ss = ScreenshotThread(self.moon_driver, self.video_folder)
+        ss.start()
+
         self.totals += len(test_cases)
         
         for tc in test_cases:
@@ -72,6 +78,10 @@ class BaseTest:
 
         self.log_to_report(f"----------------- Ending Suite: {self.__class__.__name__} -----------------", log_type="header")
         # Perform suite teardown actions after all tests are executed.
+
+        ss.stop()
+        ss.create_video_from_pngs(self.video_folder, self.reports_folder + "/video.mp4")
+
         self.suite_teardown()
 
         if self.failures > 0:
@@ -80,6 +90,7 @@ class BaseTest:
             end_string = f"{self.colors.get('pass')}{self.passes} tests passing, {self.colors.get('header')}{self.totals} tests total"
 
         self.log_to_report(end_string, log_type="header")
+
 
     def log_to_report(cls, message, log_type = "info"):
         """Log information with a timestamp to the console and to the report file.
