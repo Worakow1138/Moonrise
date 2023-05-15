@@ -10,6 +10,7 @@ from moonrise.Moon_Movie import ScreenshotThread
 class MoonBrowser:
 
     moon_driver = None
+    movie_maker = None
 
     def open_browser(self, browser_type, *browser_args, persist=False):
         """Opens a selenium browser of a specified browser type
@@ -99,7 +100,8 @@ class MoonBrowser:
         """Attempts to tear down most recent browser.
            Kills all geckodriver.exe, chromedriver.exe, and msedgedriver.exe processes.
         """
-        self.movie_maker.stop()
+        if self.movie_maker:
+            self.movie_maker.stop()
 
         try:
             self.moon_driver.quit()

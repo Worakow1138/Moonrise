@@ -49,7 +49,7 @@ class ScreenshotThread(threading.Thread):
                 # pix_fmt='yuv420p',  # Set pixel format to yuv420p
                 r=10,  # Set framerate to 10 frames per second (adjust as needed)
                 start_number=0  # Set the start number of the input files
-            ).run()
+            ).overwrite_output().run()
         finally:
             # Remove the input file list
             os.remove(input_file_list)

@@ -47,9 +47,12 @@ class BaseTest:
 
         if not os.path.exists(str(f"{os.getcwd()}/reports/{self.__module__}/{self.__class__.__name__}")):
             os.makedirs(str(f"{os.getcwd()}/reports/{self.__module__}/{self.__class__.__name__}"))
-            os.makedirs(str(f"{os.getcwd()}/reports/{self.__module__}/{self.__class__.__name__}/video"))
         self.reports_folder = str(f"{os.getcwd()}/reports/{self.__module__}/{self.__class__.__name__}")
+
+        if not os.path.exists(str(f"{self.reports_folder}/video")):
+            os.makedirs(str(f"{self.reports_folder}/video"))
         self.video_folder = self.reports_folder + "/video"
+
         self.report_file = open(f"{self.reports_folder}/{self.__class__.__name__}.log", "w")
 
         self.run_tests(test_cases)
@@ -65,9 +68,10 @@ class BaseTest:
         self.log_to_report(f"----------------- Beginning Suite: {self.__class__.__name__} -----------------", log_type="header")
         # Perform suite setup actions before any tests are executed.
         self.suite_setup()
-        self.movie_maker.start_movie(self.video_folder)
-        
 
+        if self.movie_maker:
+            self.movie_maker.start_movie(self.video_folder)
+        
         self.totals += len(test_cases)
         
         for tc in test_cases:
@@ -86,8 +90,8 @@ class BaseTest:
 
         self.log_to_report(end_string, log_type="header")
 
-        self.movie_maker.create_video_from_pngs(f"{self.reports_folder}/{self.__class__.__name__}.mp4")
-
+        if self.movie_maker:
+            self.movie_maker.create_video_from_pngs(f"{self.reports_folder}/{self.__class__.__name__}.mp4")
 
     def log_to_report(cls, message, log_type = "info"):
         """Log information with a timestamp to the console and to the report file.
