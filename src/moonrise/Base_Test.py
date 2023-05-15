@@ -77,9 +77,6 @@ class BaseTest:
         self.log_to_report(f"----------------- Ending Suite: {self.__class__.__name__} -----------------", log_type="header")
         # Perform suite teardown actions after all tests are executed.
 
-        # ss.stop()
-        # self.movie_maker.stop()
-
         self.suite_teardown()
 
         if self.failures > 0:

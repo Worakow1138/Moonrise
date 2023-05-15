@@ -3,7 +3,7 @@ import subprocess
 from selenium import webdriver
 from selenium.webdriver.remote.webdriver import WebDriver as RemoteWebDriver
 from selenium.webdriver.common.service import Service
-from moonrise.screenshots import ScreenshotThread
+from moonrise.Moon_Movie import ScreenshotThread
 
 
 
