@@ -2,7 +2,6 @@ import os
 import traceback
 from colorama import Fore, Style, init
 import datetime
-from moonrise.screenshots import ScreenshotThread
 init(convert=True)
 
 class BaseTest:
@@ -66,9 +65,8 @@ class BaseTest:
         self.log_to_report(f"----------------- Beginning Suite: {self.__class__.__name__} -----------------", log_type="header")
         # Perform suite setup actions before any tests are executed.
         self.suite_setup()
-
-        ss = ScreenshotThread(self.moon_driver, self.video_folder)
-        ss.start()
+        self.movie_maker.start_movie(self.video_folder)
+        
 
         self.totals += len(test_cases)
         
@@ -79,8 +77,8 @@ class BaseTest:
         self.log_to_report(f"----------------- Ending Suite: {self.__class__.__name__} -----------------", log_type="header")
         # Perform suite teardown actions after all tests are executed.
 
-        ss.stop()
-        ss.create_video_from_pngs(self.video_folder, self.reports_folder + "/video.mp4")
+        # ss.stop()
+        # self.movie_maker.stop()
 
         self.suite_teardown()
 
@@ -90,6 +88,8 @@ class BaseTest:
             end_string = f"{self.colors.get('pass')}{self.passes} tests passing, {self.colors.get('header')}{self.totals} tests total"
 
         self.log_to_report(end_string, log_type="header")
+
+        self.movie_maker.create_video_from_pngs(f"{self.reports_folder}/{self.__class__.__name__}.mp4")
 
 
     def log_to_report(cls, message, log_type = "info"):

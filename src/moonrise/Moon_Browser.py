@@ -3,6 +3,7 @@ import subprocess
 from selenium import webdriver
 from selenium.webdriver.remote.webdriver import WebDriver as RemoteWebDriver
 from selenium.webdriver.common.service import Service
+from moonrise.screenshots import ScreenshotThread
 
 
 
@@ -54,6 +55,8 @@ class MoonBrowser:
         # moon_driver not only creates a browser session, but also can be used in higher-order methods to access selenium methods, e.g. refresh(), maximize_window(), etc.
         self.moon_driver = browser_options[browser_type]['webdriver_create'](options=options)
 
+        self.movie_maker = ScreenshotThread(self.moon_driver)
+
         # write executor_url and session_id to a file named session_info.py for future use
         try:
             session_info_file = open(os.path.dirname(os.path.realpath(__file__))+'/session_info.py', 'w')
@@ -96,6 +99,8 @@ class MoonBrowser:
         """Attempts to tear down most recent browser.
            Kills all geckodriver.exe, chromedriver.exe, and msedgedriver.exe processes.
         """
+        self.movie_maker.stop()
+
         try:
             self.moon_driver.quit()
             self.moon_driver = None
