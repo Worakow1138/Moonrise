@@ -2,6 +2,7 @@ import os
 import traceback
 from colorama import Fore, Style, init
 import datetime
+import shutil
 init(convert=True)
 
 class BaseTest:
@@ -20,6 +21,7 @@ class BaseTest:
         """
 
         self.suite_tests = self.tests.get(f"{self.__module__}.{self.__class__.__name__}")
+        self.video_folder = None
 
         # If the condition is present where there are no tests in a suite or the user-requested tests cases do not match the current suite,
         # do not proceed.
@@ -57,6 +59,7 @@ class BaseTest:
 
         self.run_tests(test_cases)
 
+        shutil.rmtree(self.video_folder)
 
     def run_tests(self, test_cases):
         """Method to call the requested tests.
@@ -64,13 +67,12 @@ class BaseTest:
            Arguments:
            - `test_cases`: Test Case names to be executed.
         """
+        if self.movie_maker:
+            self.movie_maker.video_folder = self.video_folder
         
         self.log_to_report(f"----------------- Beginning Suite: {self.__class__.__name__} -----------------", log_type="header")
         # Perform suite setup actions before any tests are executed.
         self.suite_setup()
-
-        if self.movie_maker:
-            self.movie_maker.start_movie(self.video_folder)
         
         self.totals += len(test_cases)
         

@@ -12,7 +12,7 @@ class MoonBrowser:
     moon_driver = None
     movie_maker = None
 
-    def open_browser(self, browser_type, *browser_args, persist=False):
+    def open_browser(self, browser_type, *browser_args, persist=False, record_test=True):
         """Opens a selenium browser of a specified browser type
            Arguments:
            - browser_type: The desired browser (Chrome, Firefox, Edge, or IE).
@@ -56,7 +56,10 @@ class MoonBrowser:
         # moon_driver not only creates a browser session, but also can be used in higher-order methods to access selenium methods, e.g. refresh(), maximize_window(), etc.
         self.moon_driver = browser_options[browser_type]['webdriver_create'](options=options)
 
-        self.movie_maker = ScreenshotThread(self.moon_driver)
+        if persist != True and record_test == True:
+            self.movie_maker = ScreenshotThread(self.moon_driver)
+            if self.video_folder:
+                self.movie_maker.video_folder = self.video_folder
 
         # write executor_url and session_id to a file named session_info.py for future use
         try:

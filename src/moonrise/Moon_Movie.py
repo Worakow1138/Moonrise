@@ -1,6 +1,7 @@
 import threading
 import time
 from datetime import datetime
+from urllib3.exceptions import MaxRetryError
 import os
 import ffmpeg
 import shutil
@@ -8,26 +9,26 @@ import shutil
 class ScreenshotThread(threading.Thread):
     def __init__(self, driver):
         threading.Thread.__init__(self)
-        self.driver = driver
         self.stop_event = threading.Event()
+        self.driver = driver
         self.video_folder = None
-
-    def start_movie(self, video_folder):
-        self.video_folder = video_folder
+        self.failure_to_save = 0
         self.start()
 
     def run(self):
-        while not self.stop_event.is_set():
-            timestamp = str(datetime.now()).replace(" ", "_").replace(":", "_")
-            self.driver.save_screenshot(f"{self.video_folder}/{timestamp}.png")
-            time.sleep(0.05)
+        while not self.stop_event.is_set() and self.failure_to_save < 50:
+            try:
+                timestamp = str(datetime.now()).replace(" ", "_").replace(":", "_")
+                if not self.driver.save_screenshot(f"{self.video_folder}/{timestamp}.png"):
+                    self.failure_to_save += 1
+                time.sleep(0.05)
+            except Exception as e:
+                self.stop()
 
     def stop(self):
         self.stop_event.set()
 
     def create_video_from_pngs(self, output_file):
-        if not self.stop_event.is_set():
-            self.stop()
 
         # Get a list of PNG files in the folder
         png_files = [file for file in os.listdir(self.video_folder) if file.endswith('.png')]
@@ -42,16 +43,9 @@ class ScreenshotThread(threading.Thread):
                 file_path = os.path.join(self.video_folder, png_file)
                 f.write(f"file '{file_path}'\nduration 0.1\n")
         
-        try:
-            # Define the FFmpeg command
-            ffmpeg.input(input_file_list, format='concat', safe=0).output(
-                output_file,
-                # pix_fmt='yuv420p',  # Set pixel format to yuv420p
-                r=10,  # Set framerate to 10 frames per second (adjust as needed)
-                start_number=0  # Set the start number of the input files
-            ).overwrite_output().run()
-        finally:
-            # Remove the input file list
-            os.remove(input_file_list)
-
-            shutil.rmtree(self.video_folder)
+        ffmpeg.input(input_file_list, format='concat', safe=0).output(
+            output_file,
+            # pix_fmt='yuv420p',  # Set pixel format to yuv420p
+            r=10,  # Set framerate to 10 frames per second (adjust as needed)
+            start_number=0  # Set the start number of the input files
+        ).overwrite_output().run()
