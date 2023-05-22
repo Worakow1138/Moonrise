@@ -3,14 +3,14 @@ import subprocess
 from selenium import webdriver
 from selenium.webdriver.remote.webdriver import WebDriver as RemoteWebDriver
 from selenium.webdriver.common.service import Service
-from moonrise.Moon_Movie import ScreenshotThread
+from moonrise.Moon_Movie import VideoThread
 
 
 
 class MoonBrowser:
 
     moon_driver = None
-    screenshot_thread = None
+    video_thread = None
 
     def open_browser(self, browser_type, *browser_args, persist=False, record_test=True):
         """Opens a selenium browser of a specified browser type
@@ -18,6 +18,7 @@ class MoonBrowser:
            - browser_type: The desired browser (Chrome, Firefox, Edge, or IE).
            - browser_args: Selenium browser arguments, e.g. --headless.
            - persist: If set to True, will keep the browser open for later use.
+           - record_test: If set to True, will create a video recording during the time that the browser is open.
 
            Creates class variable moon_driver for access to selenium webdriver methods.
         """ 
@@ -56,12 +57,14 @@ class MoonBrowser:
         # moon_driver not only creates a browser session, but also can be used in higher-order methods to access selenium methods, e.g. refresh(), maximize_window(), etc.
         self.moon_driver = browser_options[browser_type]['webdriver_create'](options=options)
 
+        # Creates VideoThread object.
         if persist != True and record_test == True:
-            if self.screenshot_thread:
-                self.screenshot_thread.stop()
-            self.screenshot_thread = ScreenshotThread(self.moon_driver)
+            # Stops any previously running screenshot threads
+            if self.video_thread:
+                self.video_thread.stop()
+            self.video_thread = VideoThread(self.moon_driver)
             if self.video_folder:
-                self.screenshot_thread.video_folder = self.video_folder
+                self.video_thread.video_folder = self.video_folder
 
         # write executor_url and session_id to a file named session_info.py for future use
         try:
@@ -105,8 +108,8 @@ class MoonBrowser:
         """Attempts to tear down most recent browser.
            Kills all geckodriver.exe, chromedriver.exe, and msedgedriver.exe processes.
         """
-        if self.screenshot_thread:
-            self.screenshot_thread.stop()
+        if self.video_thread:
+            self.video_thread.stop()
 
         try:
             self.moon_driver.quit()

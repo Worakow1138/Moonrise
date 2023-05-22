@@ -67,8 +67,8 @@ class BaseTest:
            Arguments:
            - `test_cases`: Test Case names to be executed.
         """
-        if self.screenshot_thread:
-            self.screenshot_thread.video_folder = self.video_folder
+        if self.video_thread:
+            self.video_thread.video_folder = self.video_folder
         
         self.log_to_report(f"----------------- Beginning Suite: {self.__class__.__name__} -----------------", log_type="header")
         # Perform suite setup actions before any tests are executed.
@@ -82,7 +82,6 @@ class BaseTest:
 
         self.log_to_report(f"----------------- Ending Suite: {self.__class__.__name__} -----------------", log_type="header")
         # Perform suite teardown actions after all tests are executed.
-
         self.suite_teardown()
 
         if self.failures > 0:
@@ -92,9 +91,10 @@ class BaseTest:
 
         self.log_to_report(end_string, log_type="header")
 
-        if self.screenshot_thread:
-            self.screenshot_thread.create_video_from_pngs(f"{self.reports_folder}/{self.__class__.__name__}.mp4")
-            self.screenshot_thread.stop()
+        # Create video from screenshots if video_thread was created.
+        if self.video_thread:
+            self.video_thread.create_video_from_pngs(f"{self.reports_folder}/{self.__class__.__name__}.mp4")
+            self.video_thread.stop()
 
     def log_to_report(cls, message, log_type = "info"):
         """Log information with a timestamp to the console and to the report file.

@@ -1,13 +1,16 @@
 import threading
 import time
 from datetime import datetime
-from urllib3.exceptions import MaxRetryError
 import os
 import ffmpeg
-import shutil
 
-class ScreenshotThread(threading.Thread):
+class VideoThread(threading.Thread):
+    """Creates a new thread that handles the creation of video recordings for browser sessions.
+    """
     def __init__(self, driver):
+        """Receives a webdriver to create an additional thread where screenshots are taken during test execution.
+           These screenshots are converted to an mp4 file when the webdriver is killed or after the moonrise test execution has completed.
+        """
         threading.Thread.__init__(self)
         self.stop_event = threading.Event()
         self.driver = driver
@@ -43,7 +46,6 @@ class ScreenshotThread(threading.Thread):
         
         ffmpeg.input(input_file_list, format='concat', safe=0).output(
             output_file,
-            # pix_fmt='yuv420p',  # Set pixel format to yuv420p
             r=10,  # Set framerate to 10 frames per second (adjust as needed)
             start_number=0  # Set the start number of the input files
         ).overwrite_output().run()
