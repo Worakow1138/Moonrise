@@ -67,8 +67,8 @@ class BaseTest:
            Arguments:
            - `test_cases`: Test Case names to be executed.
         """
-        if self.movie_maker:
-            self.movie_maker.video_folder = self.video_folder
+        if self.screenshot_thread:
+            self.screenshot_thread.video_folder = self.video_folder
         
         self.log_to_report(f"----------------- Beginning Suite: {self.__class__.__name__} -----------------", log_type="header")
         # Perform suite setup actions before any tests are executed.
@@ -92,8 +92,9 @@ class BaseTest:
 
         self.log_to_report(end_string, log_type="header")
 
-        if self.movie_maker:
-            self.movie_maker.create_video_from_pngs(f"{self.reports_folder}/{self.__class__.__name__}.mp4")
+        if self.screenshot_thread:
+            self.screenshot_thread.create_video_from_pngs(f"{self.reports_folder}/{self.__class__.__name__}.mp4")
+            self.screenshot_thread.stop()
 
     def log_to_report(cls, message, log_type = "info"):
         """Log information with a timestamp to the console and to the report file.

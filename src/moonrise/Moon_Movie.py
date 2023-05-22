@@ -12,17 +12,15 @@ class ScreenshotThread(threading.Thread):
         self.stop_event = threading.Event()
         self.driver = driver
         self.video_folder = None
-        self.failure_to_save = 0
         self.start()
 
     def run(self):
-        while not self.stop_event.is_set() and self.failure_to_save < 50:
+        while not self.stop_event.is_set():
             try:
                 timestamp = str(datetime.now()).replace(" ", "_").replace(":", "_")
-                if not self.driver.save_screenshot(f"{self.video_folder}/{timestamp}.png"):
-                    self.failure_to_save += 1
+                self.driver.save_screenshot(f"{self.video_folder}/{timestamp}.png")
                 time.sleep(0.05)
-            except Exception as e:
+            except Exception:
                 self.stop()
 
     def stop(self):

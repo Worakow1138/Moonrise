@@ -10,7 +10,7 @@ from moonrise.Moon_Movie import ScreenshotThread
 class MoonBrowser:
 
     moon_driver = None
-    movie_maker = None
+    screenshot_thread = None
 
     def open_browser(self, browser_type, *browser_args, persist=False, record_test=True):
         """Opens a selenium browser of a specified browser type
@@ -57,9 +57,11 @@ class MoonBrowser:
         self.moon_driver = browser_options[browser_type]['webdriver_create'](options=options)
 
         if persist != True and record_test == True:
-            self.movie_maker = ScreenshotThread(self.moon_driver)
+            if self.screenshot_thread:
+                self.screenshot_thread.stop()
+            self.screenshot_thread = ScreenshotThread(self.moon_driver)
             if self.video_folder:
-                self.movie_maker.video_folder = self.video_folder
+                self.screenshot_thread.video_folder = self.video_folder
 
         # write executor_url and session_id to a file named session_info.py for future use
         try:
@@ -103,8 +105,8 @@ class MoonBrowser:
         """Attempts to tear down most recent browser.
            Kills all geckodriver.exe, chromedriver.exe, and msedgedriver.exe processes.
         """
-        if self.movie_maker:
-            self.movie_maker.stop()
+        if self.screenshot_thread:
+            self.screenshot_thread.stop()
 
         try:
             self.moon_driver.quit()
