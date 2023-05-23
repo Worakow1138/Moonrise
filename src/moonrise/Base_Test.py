@@ -142,8 +142,8 @@ class BaseTest:
         def test_executor(self):
             """Executes the current test case, performing test setup actions, handling failures, and finally calling test teardown actions.
             """
-            self.test_setup()
             try:
+                self.test_setup()
                 test_case(self)
                 self.log_to_report(f"{test_case.__name__} PASS", log_type = "pass")
                 self.passes += 1
