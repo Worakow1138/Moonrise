@@ -7,7 +7,7 @@ import ffmpeg
 class VideoThread(threading.Thread):
     """Creates a new thread that handles the creation of video recordings for browser sessions.
     """
-    def __init__(self, driver):
+    def __init__(self, driver, shutter_speed):
         """Receives a webdriver to create an additional thread where screenshots are taken during test execution.
            These screenshots are converted to an mp4 file when the webdriver is killed or after the moonrise test execution has completed.
         """
@@ -15,6 +15,7 @@ class VideoThread(threading.Thread):
         self.stop_event = threading.Event()
         self.driver = driver
         self.video_folder = None
+        self.shutter_speed = shutter_speed
         self.start()
 
     def run(self):
@@ -22,7 +23,7 @@ class VideoThread(threading.Thread):
             try:
                 timestamp = str(datetime.now()).replace(" ", "_").replace(":", "_")
                 self.driver.save_screenshot(f"{self.video_folder}/{timestamp}.png")
-                time.sleep(0.05)
+                time.sleep(self.shutter_speed)
             except Exception:
                 self.stop()
 

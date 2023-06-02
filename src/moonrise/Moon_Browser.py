@@ -12,13 +12,16 @@ class MoonBrowser:
     moon_driver = None
     video_thread = None
 
-    def open_browser(self, browser_type, *browser_args, persist=False, record_test=True):
+    def open_browser(self, browser_type, *browser_args, persist=False, record_test=True, shutter_speed=0.05):
         """Opens a selenium browser of a specified browser type
            Arguments:
            - browser_type: The desired browser (Chrome, Firefox, Edge, or IE).
            - browser_args: Selenium browser arguments, e.g. --headless.
            - persist: If set to True, will keep the browser open for later use.
            - record_test: If set to True, will create a video recording during the time that the browser is open.
+           - shutter_speed: The delay in seconds between screenshots taken for the purpose of creating the video recording.
+           Default is 0.05 seconds, or one screenshot every 20th of a second.
+           Lower values wil result in more detailed videos, but larger performance hits.
 
            Creates class variable moon_driver for access to selenium webdriver methods.
         """ 
@@ -62,7 +65,7 @@ class MoonBrowser:
             # Stops any previously running screenshot threads
             if self.video_thread:
                 self.video_thread.stop()
-            self.video_thread = VideoThread(self.moon_driver)
+            self.video_thread = VideoThread(self.moon_driver, shutter_speed)
             if self.video_folder:
                 self.video_thread.video_folder = self.video_folder
 
