@@ -60,16 +60,25 @@ class MoonMethods:
         wait = WebDriverWait(self.moon_driver, time_to_wait)
 
         try:
-            if type(locator) is WebElement:
-                return locator
-            if locator.startswith("/"):
-                return wait.until(multi_element_return.get(get_multiples)((By.XPATH, locator)))
+            if type(locator) is WebElement or type(locator) is MoonElement:
+                results = locator
+            elif locator.startswith("/"):
+                results = wait.until(multi_element_return.get(get_multiples)((By.XPATH, locator)))
             elif locator.split(":")[0] in location_methods:
-                return wait.until(multi_element_return.get(get_multiples)((location_methods[locator.split(":")[0]], locator.split(":")[1])))
+                results = wait.until(multi_element_return.get(get_multiples)((location_methods[locator.split(":")[0]], locator.split(":")[1])))
             else:
-                return wait.until(multi_element_return.get(get_multiples)((By.CSS_SELECTOR, locator)))
+                results = wait.until(multi_element_return.get(get_multiples)((By.CSS_SELECTOR, locator)))
         except TimeoutException:
             raise TimeoutException(f"Could not find '{locator}' after {time_to_wait} seconds.")
+        
+        # Convert WebElement(s) to MoonElement(s)
+        if type(results) is list:
+            elements = []
+            for e in results:
+                elements.append(MoonElement(e))
+            return elements
+        else:
+            return MoonElement(results)
 
     def click_element(self, locator, timeout=None):
         """Click the element identified by ``locator``.
@@ -137,3 +146,28 @@ class MoonMethods:
            - ``timeout``: How long to search for the element before throwing a TimeoutException.
         """
         return self.get_web_element(locator=locator, timeout=timeout).text
+    
+class MoonElement(WebElement):
+    """Replacement object for standard WebElements.
+       Inherits all attributes and methods of Selenium WebElements with additional methods. 
+    """
+
+    def __init__(self, element: WebElement):
+        self.element = element
+        self.driver = element.parent
+        super().__init__(self.driver, element.id)
+
+    def get_parent(self):
+        """Return the parent element of a WebElement.
+        """
+        return MoonElement(self.driver.execute_script("return arguments[0].parentNode", self.element))
+    
+    def get_children(self, locator: str = "*"):
+        """Returns all child elements of a WebElement.
+           Arguments:
+           - ``locator``: The method by which to locate children of the given WebElement.
+        """
+        elements = []
+        for e in self.driver.execute_script(f"return arguments[0].querySelectorAll('{locator}')", self.element):
+            elements.append(MoonElement(e))
+        return elements
