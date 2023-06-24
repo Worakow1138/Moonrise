@@ -2,6 +2,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import TimeoutException
 
@@ -147,6 +148,32 @@ class MoonMethods:
         """
         return self.get_web_element(locator=locator, timeout=timeout).text
     
+    def drag_element_to_element(self, dragged_locator: str, target_locator: str, timeout: int = None):
+        """Clicks and drags one element to another element.
+
+           Arguments:
+           - ``dragged_locator`` (str): Locator for the element to be clicked and dragged.
+           - ``target_locator`` (str): Locator for the element that the dragged element will be dragged to.
+           - ``timeout`` (int, optional): Maximum time (in seconds) to search for both the dragged and target elements before throwing a TimeoutException.
+        """
+        dragged_element = self.get_web_element(locator=dragged_locator, timeout=timeout)
+        target_element = self.get_web_element(locator=target_locator, timeout=timeout)
+
+        ActionChains(self.moon_driver).drag_and_drop(dragged_element, target_element).perform()
+
+    def drag_element_to_offset(self, dragged_locator: str, x_offset: int, y_offset: int, timeout: int = None):
+        """Clicks and drags one element to another element.
+
+           Arguments:
+           - ``dragged_locator`` (str): Locator for the element to be clicked and dragged.
+           - ``x_offset`` (int): The number of pixels to drag the element along the x axis.
+           - ``y_offset`` (int): The number of pixels to drag the element along the y axis.
+           - ``timeout`` (int, optional): Maximum time (in seconds) to search for the dragged element before throwing a TimeoutException.
+        """
+        dragged_element = self.get_web_element(locator=dragged_locator, timeout=timeout)
+
+        ActionChains(self.moon_driver).drag_and_drop_by_offset(dragged_element, xoffset=x_offset, yoffset=y_offset).perform()
+
 class MoonElement(WebElement):
     """Replacement object for standard WebElements.
        Inherits all attributes and methods of Selenium WebElements with additional methods. 
