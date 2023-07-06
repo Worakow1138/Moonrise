@@ -76,8 +76,8 @@ class BaseTest:
         
         self.totals += len(test_cases)
         
-        for tc in test_cases:
-            self.log_to_report(f"--- Starting test: {tc} ---", log_type="header")
+        for tc_number, tc in enumerate(test_cases):
+            self.log_to_report(f"--- Starting test {tc_number + 1} of {len(test_cases)}: {tc} ---", log_type="header")
             self.suite_tests.get(tc)(self)
 
         self.log_to_report(f"----------------- Ending Suite: {self.__class__.__name__} -----------------", log_type="header")
