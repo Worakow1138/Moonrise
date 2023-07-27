@@ -174,6 +174,17 @@ class MoonMethods:
 
         ActionChains(self.moon_driver).drag_and_drop_by_offset(dragged_element, xoffset=x_offset, yoffset=y_offset).perform()
 
+    def scroll_to_element(self, locator: str, timeout: int = None):
+        """Scrolls an element into view.
+
+           Arguments:
+           - ``locator`` (str): Locator for the element to be scrolled into view.
+           - ``timeout`` (int, optional): Maximum time (in seconds) to search for the element before throwing a TimeoutException.
+        """
+        element = self.get_web_element(locator=locator, timeout=timeout)
+
+        self.moon_driver.execute_script("arguments[0].scrollIntoView();", element)
+
 class MoonElement(WebElement):
     """Replacement object for standard WebElements.
        Inherits all attributes and methods of Selenium WebElements with additional methods. 
