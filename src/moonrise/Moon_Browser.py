@@ -1,6 +1,7 @@
 import os
 import subprocess
 from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.remote.webdriver import WebDriver as RemoteWebDriver
 from selenium.webdriver.common.service import Service
 from moonrise.Moon_Movie import VideoThread
@@ -11,6 +12,10 @@ class MoonBrowser:
 
     moon_driver = None
     video_thread = None
+
+    # Default time to wait for elements to become visible.
+    # Can be changed in a Moonrise Test Suite by setting Moonrise.default_timeout = (new timeout)
+    default_timeout = 30
 
     def open_browser(self, browser_type, *browser_args, persist=False, record_test=True, shutter_speed=0.05):
         """Opens a selenium browser of a specified browser type
@@ -60,6 +65,9 @@ class MoonBrowser:
         # moon_driver not only creates a browser session, but also can be used in higher-order methods to access selenium methods, e.g. refresh(), maximize_window(), etc.
         self.moon_driver = browser_options[browser_type]['webdriver_create'](options=options)
 
+        # The WebDriverWait object that will inform how long elements are waited for.
+        self.wait = WebDriverWait(self.moon_driver, self.default_timeout)
+
         # Creates VideoThread object.
         if persist != True and record_test == True:
             # Stops any previously running screenshot threads
@@ -94,14 +102,16 @@ class MoonBrowser:
         def new_command_execute(self, command, params=None):
             if command == "newSession":
                 # Mock the response
-                return {'success': 0, 'value': None, 'sessionId': session_info.session_id}
+                return {"value": {"sessionId": session_info.session_id, "capabilities": params}}
             else:
                 return org_command_execute(self, command, params)
 
         # Patch the function before creating the driver object
         RemoteWebDriver.execute = new_command_execute
 
-        self.moon_driver = webdriver.Remote(command_executor=session_info.executor_url, desired_capabilities={})
+        self.moon_driver = webdriver.Remote(command_executor=session_info.executor_url, options=[])
+
+        self.wait = WebDriverWait(self.moon_driver, self.default_timeout)
 
         # Replace the patched function with original function
         RemoteWebDriver.execute = org_command_execute
