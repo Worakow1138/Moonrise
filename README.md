@@ -19,7 +19,14 @@ Notable features:
 - Test report generation
 
 ## Dependencies
-Moonrise only has two dependencies: [selenium](https://pypi.org/project/selenium/) and [colorama](https://pypi.org/project/colorama/). Both of these dependencies are automatically installed with moonrise.
+Moonrise's current dependencies are:
+- [selenium](https://pypi.org/project/selenium/)
+- [colorama](https://pypi.org/project/colorama/)
+- [ffmpeg](https://pypi.org/project/ffmpeg-python/)
+
+These are all automatically installed with `pip install moonrise`.
+
+NOTE: Recording tests does require one additional piece of software, the lightweight [ffmpeg](https://www.ffmpeg.org/)
 
 ## Installation
 Recommend using pypi to install moonrise, `pip install moonrise`. You may also retrieve the latest version from [github](https://github.com/Worakow1138/Moonrise).

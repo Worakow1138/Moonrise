@@ -17,7 +17,7 @@ class MoonBrowser:
     # Can be changed in a Moonrise Test Suite by setting Moonrise.default_timeout = (new timeout)
     default_timeout = 30
 
-    def open_browser(self, browser_type, *browser_args, persist=False, record_test=True, shutter_speed=0.05):
+    def open_browser(self, browser_type, *browser_args, persist=False, record_test=False, shutter_speed=0.05):
         """Opens a selenium browser of a specified browser type
            Arguments:
            - browser_type: The desired browser (Chrome, Firefox, Edge, or IE).
@@ -70,12 +70,17 @@ class MoonBrowser:
 
         # Creates VideoThread object.
         if persist != True and record_test == True:
-            # Stops any previously running screenshot threads
-            if self.video_thread:
-                self.video_thread.stop()
-            self.video_thread = VideoThread(self.moon_driver, shutter_speed)
-            if self.video_folder:
-                self.video_thread.video_folder = self.video_folder
+            try:
+                # Determine if ffmpeg is available
+                subprocess.run("ffmpeg", capture_output=True, text=True)
+                # Stops any previously running screenshot threads
+                if self.video_thread:
+                    self.video_thread.stop()
+                self.video_thread = VideoThread(self.moon_driver, shutter_speed)
+                if self.video_folder:
+                    self.video_thread.video_folder = self.video_folder
+            except FileNotFoundError:
+                self.log_to_report("ffmpeg is required to record tests. Is it installed? Download at https://www.ffmpeg.org/", log_type = "fail")
 
         # write executor_url and session_id to a file named session_info.py for future use
         try:
