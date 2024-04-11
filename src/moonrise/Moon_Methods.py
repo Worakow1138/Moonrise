@@ -4,6 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import TimeoutException
+from typing import Union
 
 class MoonMethods:
     """Common-use methods when locating and interacting with web elements
