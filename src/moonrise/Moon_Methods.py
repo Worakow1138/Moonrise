@@ -178,6 +178,51 @@ class MoonMethods:
 
         self.moon_driver.execute_script("arguments[0].scrollIntoView();", element)
 
+    def element_present(self, locator: Union[str, WebElement], timeout: int = None):
+        """Searches for an element specified by ``locator``.
+           Returns ``True`` if the element is present and ``False`` if the element is not present.
+
+           Arguments:
+           - ``locator`` (str or WebElement): Locator for the element to be checked for being present.
+           - ``timeout`` (int, optional): Maximum time (in seconds) to search for the element.
+        """
+        try:
+            self.get_web_element(locator=locator, timeout=timeout)
+            return True
+        except TimeoutException:
+            return False
+        
+    def any_elements_present(self, locators: list, timeout: int = None):
+        """Searches for a ``list`` of elements.
+           Returns ``True`` if ANY of the specified elements are present and ``False`` if NONE of the elements are present.
+
+           Arguments:
+           - ``locators`` (list of strings or WebElements): List of element locators for the elements to be searched for being present.
+           - ``timeout`` (int, optional): Maximum time (in seconds) to search for the specified elements.
+        """
+        for locator in locators:
+            try:
+                self.get_web_element(locator=locator, timeout=timeout)
+                return True
+            except TimeoutException:
+                continue
+        return False
+    
+    def all_elements_present(self, locators: list, timeout: int = None):
+        """Searches for a ``list`` of elements.
+           Returns ``True`` if ALL of the specified elements are present and ``False`` if ANY of the elements are not present.
+
+           Arguments:
+           - ``locators`` (list of strings or WebElements): List of element locators for the elements to be searched for being present.
+           - ``timeout`` (int, optional): Maximum time (in seconds) to search for the specified elements.
+        """
+        for locator in locators:
+            try:
+                self.get_web_element(locator=locator, timeout=timeout)
+            except TimeoutException:
+                return False
+        return True
+
 class MoonElement(WebElement):
     """Replacement object for standard WebElements.
        Inherits all attributes and methods of Selenium WebElements with additional methods. 
