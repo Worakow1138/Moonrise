@@ -10,7 +10,7 @@ class MoonMethods:
     """Common-use methods when locating and interacting with web elements
     """
 
-    def get_web_element(self, locator, timeout=None, get_multiples = False):
+    def get_web_element(self, locator: Union[str, WebElement], timeout: int = None, get_multiples: bool = False):
         """Locate a web element or elements via a given ``locator``.
            Throws a TimeoutException if the element(s) cannot be found within ``timeout`` or default_timeout
 
@@ -75,7 +75,7 @@ class MoonMethods:
         else:
             return MoonElement(results)
 
-    def click_element(self, locator, timeout=None):
+    def click_element(self, locator: Union[str, WebElement], timeout: int = None):
         """Click the element identified by ``locator``.
 
            Arguments:
@@ -85,7 +85,7 @@ class MoonMethods:
         self.get_web_element(locator=locator, timeout=timeout).click()
 
 
-    def input_text(self, locator, text, timeout=None):
+    def input_text(self, locator: Union[str, WebElement], text: str, timeout: int = None):
         """Types the given ``text`` into the text field identified by ``locator``.
 
            Arguments:
@@ -94,7 +94,7 @@ class MoonMethods:
         """
         self.get_web_element(locator=locator, timeout=timeout).send_keys(text)
 
-    def get_web_elements(self, locator, timeout=None):
+    def get_web_elements(self, locator: Union[str, WebElement], timeout: int = None):
         """Returns a list of WebElement objects matching the ``locator``.
 
            Arguments:
@@ -103,7 +103,7 @@ class MoonMethods:
         """
         return self.get_web_element(locator=locator, timeout=timeout, get_multiples=True)
 
-    def select_from_list_by_value(self, locator, value, timeout=None):
+    def select_from_list_by_value(self, locator: Union[str, WebElement], value: str, timeout: int = None):
         """Select option from selection list ``locator`` by ``value``.
 
            Arguments:
@@ -113,7 +113,7 @@ class MoonMethods:
         """
         Select(self.get_web_element(locator=locator, timeout=timeout)).select_by_value(value)
         
-    def select_from_list_by_label(self, locator, label, timeout=None):
+    def select_from_list_by_label(self, locator: Union[str, WebElement], label: str, timeout: int = None):
         """Select option from selection list ``locator`` by ``label``.
 
            Arguments:
@@ -123,7 +123,7 @@ class MoonMethods:
         """
         Select(self.get_web_element(locator=locator, timeout=timeout)).select_by_visible_text(label)
 
-    def select_from_list_by_index(self, locator, index, timeout=None):
+    def select_from_list_by_index(self, locator: Union[str, WebElement], index: int, timeout: int = None):
         """Select option from selection list ``locator`` by ``index``.
 
            Arguments:
@@ -133,7 +133,7 @@ class MoonMethods:
         """
         Select(self.get_web_element(locator=locator, timeout=timeout)).select_by_index(index) 
 
-    def get_text(self, locator, timeout=None):
+    def get_text(self, locator: Union[str, WebElement], timeout: int = None) -> str:
         """Returns the text value of the element identified by ``locator``.
 
            Arguments:
@@ -142,7 +142,7 @@ class MoonMethods:
         """
         return self.get_web_element(locator=locator, timeout=timeout).text
     
-    def drag_element_to_element(self, dragged_locator: str, target_locator: str, timeout: int = None):
+    def drag_element_to_element(self, dragged_locator: Union[str, WebElement], target_locator: Union[str, WebElement], timeout: int = None):
         """Clicks and drags one element to another element.
 
            Arguments:
@@ -155,7 +155,7 @@ class MoonMethods:
 
         ActionChains(self.moon_driver).drag_and_drop(dragged_element, target_element).perform()
 
-    def drag_element_to_offset(self, dragged_locator: str, x_offset: int, y_offset: int, timeout: int = None):
+    def drag_element_to_offset(self, dragged_locator: Union[str, WebElement], x_offset: int, y_offset: int, timeout: int = None):
         """Clicks and drags one element to another element.
 
            Arguments:
@@ -168,7 +168,7 @@ class MoonMethods:
 
         ActionChains(self.moon_driver).drag_and_drop_by_offset(dragged_element, xoffset=x_offset, yoffset=y_offset).perform()
 
-    def scroll_to_element(self, locator: str, timeout: int = None):
+    def scroll_to_element(self, locator: Union[str, WebElement], timeout: int = None):
         """Scrolls an element into view.
 
            Arguments:
