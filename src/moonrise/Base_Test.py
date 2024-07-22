@@ -1,7 +1,7 @@
 import os
 import traceback
 from colorama import Fore, Style, init
-import datetime
+from datetime import datetime
 import shutil
 init(convert=True)
 
@@ -103,7 +103,7 @@ class BaseTest:
            - message: The text to log.
            - log_type: The color of the text as it will appear in the console. Consult the colors variable in this class for specifics.
         """
-        timestamp = datetime.datetime.now()
+        timestamp = datetime.now()
         print(f"\n{cls.colors.get(log_type)}{timestamp} | {message}{Style.RESET_ALL}")
         for color in cls.colors.values():
             message = message.replace(color, "")

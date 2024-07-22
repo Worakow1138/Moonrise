@@ -3,6 +3,8 @@ import time
 from datetime import datetime
 import os
 import ffmpeg
+from colorama import Fore, Style, init
+init(convert=True)
 
 class VideoThread(threading.Thread):
     """Creates a new thread that handles the creation of video recordings for browser sessions.
@@ -44,9 +46,13 @@ class VideoThread(threading.Thread):
             for i, png_file in enumerate(png_files):
                 file_path = os.path.join(self.video_folder, png_file)
                 f.write(f"file '{file_path}'\nduration 0.1\n")
+
+        print(f"\n{Fore.YELLOW}{datetime.now()} | {f"Creating video file, reports{str(output_file).split("reports")[1]}..."}{Style.RESET_ALL}")
         
-        ffmpeg.input(input_file_list, format='concat', safe=0).output(
+        ffmpeg.input(input_file_list, format='concat', safe=0, loglevel='quiet').output(
             output_file,
             r=10,  # Set framerate to 10 frames per second (adjust as needed)
             start_number=0  # Set the start number of the input files
         ).overwrite_output().run()
+
+        print(f"\n{Fore.YELLOW}{datetime.now()} | {f"Video file, reports{str(output_file).split("reports")[1]} created"}{Style.RESET_ALL}")
