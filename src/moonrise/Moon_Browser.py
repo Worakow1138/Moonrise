@@ -85,7 +85,7 @@ class MoonBrowser:
         # write executor_url and session_id to a file named session_info.py for future use
         try:
             session_info_file = open(os.path.dirname(os.path.realpath(__file__))+'/session_info.py', 'w')
-            session_info_file.write(f'executor_url="{self.moon_driver.command_executor._url}"\nsession_id="{self.moon_driver.session_id}"')
+            session_info_file.write(f'executor_url="{self.moon_driver.command_executor._client_config.remote_server_addr}"\nsession_id="{self.moon_driver.session_id}"')
             session_info_file.close()
         except FileNotFoundError:
             pass
